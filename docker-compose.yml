@@ -1,0 +1,50 @@
+version: '3.5'
+
+services:
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx_learn
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+
+  publisher:
+    image: 'bitnami/laravel'
+    container_name: publisher
+    env_file:
+      - enviroments/env/publisher.env
+    volumes:
+      - ./config/php.ini:/path/to/php.ini/in/container
+      - /Users/akame500/Learn/publisher:/app
+
+  consumer:
+    image: 'bitnami/laravel'
+    container_name: consumer
+    env_file:
+      - enviroments/env/consumer.env
+    volumes:
+      - ./config/php.ini:/path/to/php.ini/in/container
+      - /Users/akame500/Learn/consumer:/app
+
+  database:
+    container_name: mariadb_learn
+    image: 'mariadb:latest'
+    environment:
+      - MYSQL_ROOT_PASSWORD=docker
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/dump:/srv/dump
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: "redis:6.2.5-alpine"
+
+  rabbitmq:
+    container_name: rabbitmq_learn
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
